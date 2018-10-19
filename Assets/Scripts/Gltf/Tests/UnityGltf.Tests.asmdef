@@ -1,0 +1,12 @@
+{
+    "name": "UnityGltf.Tests",
+    "references": [
+        "UnityGltf"
+    ],
+    "optionalUnityReferences": [
+        "TestAssemblies"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false
+}
