@@ -3,7 +3,7 @@ using System.IO;
 
 namespace UnityGltf.Utilities
 {
-	public static class StreamExtensions
+	internal static class StreamExtensions
 	{
 		public static byte[] ReadAllBytes(this Stream stream)
 		{

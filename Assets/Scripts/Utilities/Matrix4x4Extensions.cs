@@ -2,7 +2,7 @@
 
 namespace UnityGltf.Utilities
 {
-	public static class Matrix4x4Extensions
+	internal static class Matrix4x4Extensions
 	{
 		public static Vector3 GetPosition(this Matrix4x4 mat)
 		{
