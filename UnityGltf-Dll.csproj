@@ -56,32 +56,27 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Scripts\Gltf\AccessorLoader.cs" />
-    <Compile Include="Assets\Scripts\Gltf\AnimationLoader.cs" />
-    <Compile Include="Assets\Scripts\Gltf\AssetCache.cs" />
-    <Compile Include="Assets\Scripts\Gltf\AssetManager.cs" />
-    <Compile Include="Assets\Scripts\Gltf\AssetManagerReference.cs" />
-    <Compile Include="Assets\Scripts\Gltf\ColliderLoader.cs" />
-    <Compile Include="Assets\Scripts\Gltf\CoordinateSystemConverter.cs" />
-    <Compile Include="Assets\Scripts\Gltf\ExtensionUtil.cs" />
-    <Compile Include="Assets\Scripts\Gltf\GltfConfig.cs" />
-    <Compile Include="Assets\Scripts\Gltf\GltfLoader.cs" />
-    <Compile Include="Assets\Scripts\Gltf\GltfLoaderData.cs" />
-    <Compile Include="Assets\Scripts\Gltf\GltfMesh.cs" />
-    <Compile Include="Assets\Scripts\Gltf\MaterialLoader.cs" />
-    <Compile Include="Assets\Scripts\Gltf\MeshLoader.cs" />
-    <Compile Include="Assets\Scripts\Gltf\NodeLoader.cs" />
-    <Compile Include="Assets\Scripts\Gltf\PersistentAssetCache.cs" />
-    <Compile Include="Assets\Scripts\Gltf\ReferenceCounter.cs" />
-    <Compile Include="Assets\Scripts\Gltf\TypeConverter.cs" />
-    <Compile Include="Assets\Scripts\Gltf\Utilities\Matrix4x4Extensions.cs" />
-    <Compile Include="Assets\Scripts\Gltf\Utilities\StreamExtensions.cs" />
+    <Compile Include="Assets\Scripts\AccessorLoader.cs" />
+    <Compile Include="Assets\Scripts\AnimationLoader.cs" />
+    <Compile Include="Assets\Scripts\AssetCache.cs" />
+    <Compile Include="Assets\Scripts\AssetManager.cs" />
+    <Compile Include="Assets\Scripts\AssetManagerReference.cs" />
+    <Compile Include="Assets\Scripts\ColliderLoader.cs" />
+    <Compile Include="Assets\Scripts\CoordinateSystemConverter.cs" />
+    <Compile Include="Assets\Scripts\ExtensionUtil.cs" />
+    <Compile Include="Assets\Scripts\GltfConfig.cs" />
+    <Compile Include="Assets\Scripts\GltfLoader.cs" />
+    <Compile Include="Assets\Scripts\GltfLoaderData.cs" />
+    <Compile Include="Assets\Scripts\GltfMesh.cs" />
+    <Compile Include="Assets\Scripts\MaterialLoader.cs" />
+    <Compile Include="Assets\Scripts\MeshLoader.cs" />
+    <Compile Include="Assets\Scripts\NodeLoader.cs" />
+    <Compile Include="Assets\Scripts\PersistentAssetCache.cs" />
+    <Compile Include="Assets\Scripts\ReferenceCounter.cs" />
+    <Compile Include="Assets\Scripts\TypeConverter.cs" />
+    <Compile Include="Assets\Scripts\Utilities\Matrix4x4Extensions.cs" />
+    <Compile Include="Assets\Scripts\Utilities\StreamExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Assets\Plugins\gltfLoader\glTFLoader.dll" />
-    <Content Include="Assets\Plugins\gltfLoader\Newtonsoft.Json.dll" />
-    <Content Include="Assets\Plugins\UnityDds\UnityDds.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
