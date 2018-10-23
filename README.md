@@ -1,5 +1,12 @@
 # UnityGltf
-glTF importer for Unity
+glTF importer for Unity (similar to https://github.com/KhronosGroup/UnityGLTF)
+
+Features:
+- Runtime gltf/glb importing
+- Animation importing (excluding morph targets)
+- DDS extension (https://github.com/Panzerhandschuh/glTF/tree/master/extensions/2.0/Vendor/MSFT_texture_dds)
+- Unity collider extension (https://github.com/Panzerhandschuh/glTF/tree/master/extensions/2.0/Vendor/Unity_colliders)
+- Reference counting (assets loaded with the AssetManager will re-use resources if they are already loaded)
 
 # Usage
 Loading a non-reference counted glTF asset:
