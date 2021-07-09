@@ -1,12 +1,23 @@
 {
     "name": "UnityGltf.Tests",
+    "rootNamespace": "",
     "references": [
-        "UnityGltf"
-    ],
-    "optionalUnityReferences": [
-        "TestAssemblies"
+        "UnityGltf",
+        "UnityEngine.TestRunner",
+        "UnityEditor.TestRunner"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
-    "allowUnsafeCode": false
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "nunit.framework.dll",
+        "glTFLoader.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "UNITY_INCLUDE_TESTS"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
 }
