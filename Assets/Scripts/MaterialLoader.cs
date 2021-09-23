@@ -149,9 +149,13 @@ namespace UnityGltf
 			var emissiveTexture = material.EmissiveTexture;
 			if (emissiveTexture != null)
 			{
+				// Strength
+				var strengthExtension = ExtensionUtil.LoadExtension<glTFLoader.Schema.Khr_materials_emissive_strength>(material.Extensions, "KHR_materials_emissive_strength");
+				var strength = strengthExtension != null ? strengthExtension.EmissiveStrength : 1f;
+
 				// Factor
 				var factor = TypeConverter.ConvertColor(material.EmissiveFactor);
-				unityMaterial.SetColor("_EmissionColor", factor);
+				unityMaterial.SetColor("_EmissionColor", factor * strength);
 
 				// Texture
 				var texture = LoadTexture(emissiveTexture.Index);
