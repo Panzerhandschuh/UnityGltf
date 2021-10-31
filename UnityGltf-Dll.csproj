@@ -73,6 +73,7 @@
     <Compile Include="Assets\Scripts\NodeLoader.cs" />
     <Compile Include="Assets\Scripts\PersistentAssetCache.cs" />
     <Compile Include="Assets\Scripts\ReferenceCounter.cs" />
+    <Compile Include="Assets\Scripts\TextureLoader.cs" />
     <Compile Include="Assets\Scripts\TypeConverter.cs" />
     <Compile Include="Assets\Scripts\Utilities\Matrix4x4Extensions.cs" />
     <Compile Include="Assets\Scripts\Utilities\StreamExtensions.cs" />

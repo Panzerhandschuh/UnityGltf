@@ -1,19 +1,17 @@
-﻿using System;
-using glTFLoader;
-using UnityDds;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Rendering;
-using UnityGltf.Utilities;
 
 namespace UnityGltf
 {
 	public class MaterialLoader
 	{
 		private GltfLoaderData data;
+		private TextureLoader textureLoader;
 
 		public MaterialLoader(GltfLoaderData data)
 		{
 			this.data = data;
+			textureLoader = new TextureLoader(data);
 		}
 
 		public Material LoadMaterial(int materialIndex)
@@ -56,8 +54,8 @@ namespace UnityGltf
 			{
 				case glTFLoader.Schema.Material.AlphaModeEnum.MASK:
 					unityMaterial.SetOverrideTag("RenderType", "TransparentCutout");
-					unityMaterial.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.One);
-					unityMaterial.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.Zero);
+					unityMaterial.SetInt("_SrcBlend", (int)BlendMode.One);
+					unityMaterial.SetInt("_DstBlend", (int)BlendMode.Zero);
 					unityMaterial.SetInt("_ZWrite", 1);
 					unityMaterial.EnableKeyword("_ALPHATEST_ON");
 					unityMaterial.DisableKeyword("_ALPHABLEND_ON");
@@ -68,8 +66,8 @@ namespace UnityGltf
 					break;
 				case glTFLoader.Schema.Material.AlphaModeEnum.BLEND:
 					unityMaterial.SetOverrideTag("RenderType", "Transparent");
-					unityMaterial.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
-					unityMaterial.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
+					unityMaterial.SetInt("_SrcBlend", (int)BlendMode.SrcAlpha);
+					unityMaterial.SetInt("_DstBlend", (int)BlendMode.OneMinusSrcAlpha);
 					unityMaterial.SetInt("_ZWrite", 0);
 					unityMaterial.DisableKeyword("_ALPHATEST_ON");
 					unityMaterial.EnableKeyword("_ALPHABLEND_ON");
@@ -79,8 +77,8 @@ namespace UnityGltf
 				case glTFLoader.Schema.Material.AlphaModeEnum.OPAQUE:
 				default:
 					unityMaterial.SetOverrideTag("RenderType", "Opaque");
-					unityMaterial.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.One);
-					unityMaterial.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.Zero);
+					unityMaterial.SetInt("_SrcBlend", (int)BlendMode.One);
+					unityMaterial.SetInt("_DstBlend", (int)BlendMode.Zero);
 					unityMaterial.SetInt("_ZWrite", 1);
 					unityMaterial.DisableKeyword("_ALPHATEST_ON");
 					unityMaterial.DisableKeyword("_ALPHABLEND_ON");
@@ -93,37 +91,37 @@ namespace UnityGltf
 		private void LoadMetallicRoughnessMap(glTFLoader.Schema.Material material, Material unityMaterial)
 		{
 			var pbrMat = material.PbrMetallicRoughness;
-			if (pbrMat == null)
-				return;
-
-			// Base color factor
-			var baseColorFactor = TypeConverter.ConvertColor(pbrMat.BaseColorFactor);
-			unityMaterial.SetColor("_Color", baseColorFactor);
-
-			// Base color texture
-			var baseColorTexture = pbrMat.BaseColorTexture;
-			if (baseColorTexture != null)
+			if (pbrMat != null)
 			{
-				var texture = LoadTexture(baseColorTexture.Index);
-				unityMaterial.SetTexture("_MainTex", texture);
-			}
+				// Base color factor
+				var baseColorFactor = TypeConverter.ConvertColor(pbrMat.BaseColorFactor);
+				unityMaterial.SetColor("_Color", baseColorFactor);
 
-			// Metallic factor
-			var metallic = pbrMat.MetallicFactor;
-			unityMaterial.SetFloat("_Metallic", metallic);
+				// Base color texture
+				var baseColorTexture = pbrMat.BaseColorTexture;
+				if (baseColorTexture != null)
+				{
+					var texture = textureLoader.LoadTexture(baseColorTexture.Index);
+					unityMaterial.SetTexture("_MainTex", texture);
+				}
 
-			// Roughness factor
-			var roughness = pbrMat.RoughnessFactor;
-			unityMaterial.SetFloat("_Glossiness", 1f - roughness);
+				// Metallic factor
+				var metallic = pbrMat.MetallicFactor;
+				unityMaterial.SetFloat("_Metallic", metallic);
 
-			// Metallic-roughness texture
-			var metallicRoughnessTexture = pbrMat.MetallicRoughnessTexture;
-			if (metallicRoughnessTexture != null)
-			{
-				var texture = LoadTexture(metallicRoughnessTexture.Index);
-				unityMaterial.SetTexture("_MetallicGlossMap", texture);
+				// Roughness factor
+				var roughness = pbrMat.RoughnessFactor;
+				unityMaterial.SetFloat("_Glossiness", 1f - roughness);
 
-				unityMaterial.EnableKeyword("_METALLICGLOSSMAP");
+				// Metallic-roughness texture
+				var metallicRoughnessTexture = pbrMat.MetallicRoughnessTexture;
+				if (metallicRoughnessTexture != null)
+				{
+					var texture = textureLoader.LoadTexture(metallicRoughnessTexture.Index);
+					unityMaterial.SetTexture("_MetallicGlossMap", texture);
+
+					unityMaterial.EnableKeyword("_METALLICGLOSSMAP");
+				}
 			}
 		}
 
@@ -137,7 +135,7 @@ namespace UnityGltf
 				unityMaterial.SetFloat("_BumpScale", scale);
 
 				// Texture
-				var texture = LoadTexture(normalTexture.Index);
+				var texture = textureLoader.LoadTexture(normalTexture.Index);
 				unityMaterial.SetTexture("_BumpMap", texture);
 
 				unityMaterial.EnableKeyword("_NORMALMAP");
@@ -147,7 +145,7 @@ namespace UnityGltf
 		private void LoadEmissiveMap(glTFLoader.Schema.Material material, Material unityMaterial)
 		{
 			var emissiveTexture = material.EmissiveTexture;
-			if (emissiveTexture != null)
+			if (emissiveTexture != null || material.ShouldSerializeEmissiveFactor())
 			{
 				// Strength
 				var strengthExtension = ExtensionUtil.LoadExtension<glTFLoader.Schema.Khr_materials_emissive_strength>(material.Extensions, "KHR_materials_emissive_strength");
@@ -158,8 +156,11 @@ namespace UnityGltf
 				unityMaterial.SetColor("_EmissionColor", factor * strength);
 
 				// Texture
-				var texture = LoadTexture(emissiveTexture.Index);
-				unityMaterial.SetTexture("_EmissionMap", texture);
+				if (emissiveTexture != null)
+				{
+					var texture = textureLoader.LoadTexture(emissiveTexture.Index);
+					unityMaterial.SetTexture("_EmissionMap", texture);
+				}
 
 				unityMaterial.EnableKeyword("_EMISSION");
 			}
@@ -175,144 +176,8 @@ namespace UnityGltf
 				unityMaterial.SetFloat("_OcclusionStrength", strength);
 
 				// Texture
-				var texture = LoadTexture(occlusionTexture.Index);
+				var texture = textureLoader.LoadTexture(occlusionTexture.Index);
 				unityMaterial.SetTexture("_OcclusionMap", texture);
-			}
-		}
-
-		private Texture2D LoadTexture(int textureIndex)
-		{
-			var texture = data.gltf.Textures[textureIndex];
-
-			var ddsExtension = ExtensionUtil.LoadExtension<glTFLoader.Schema.Msft_texture_ddsExtension>(texture.Extensions, "MSFT_texture_dds");
-			if (ddsExtension != null && ddsExtension.Source.HasValue)
-				return LoadDdsTexture(ddsExtension.Source.Value, texture.Sampler);
-			else if (texture.Source.HasValue)
-				return LoadImageTexture(texture.Source.Value, texture.Sampler);
-
-			return null;
-		}
-
-		private Texture2D LoadDdsTexture(int imageIndex, int? samplerIndex)
-		{
-			var unityTexture = data.cache.images[imageIndex];
-			if (unityTexture == null)
-			{
-				unityTexture = LoadDds(imageIndex);
-				LoadSampler(samplerIndex, unityTexture);
-
-				data.cache.images[imageIndex] = unityTexture;
-			}
-
-			return unityTexture;
-		}
-
-		private Texture2D LoadDds(int imageIndex)
-		{
-			var externalReferenceSolver = data.GetExternalReferenceSolver();
-			using (var stream = data.gltf.OpenImageFile(imageIndex, externalReferenceSolver))
-			{
-				return DdsTextureLoader.LoadTexture(stream);
-			}
-		}
-		
-		private Texture2D LoadImageTexture(int imageIndex, int? samplerIndex)
-		{
-			var unityTexture = data.cache.images[imageIndex];
-			if (unityTexture == null)
-			{
-				unityTexture = LoadImage(imageIndex);
-				LoadSampler(samplerIndex, unityTexture);
-
-				data.cache.images[imageIndex] = unityTexture;
-			}
-
-			return unityTexture;
-		}
-
-		private Texture2D LoadImage(int imageIndex)
-		{
-			var texture = new Texture2D(0, 0);
-
-			var data = LoadImageData(imageIndex);
-			texture.LoadImage(data, true);
-
-			return texture;
-		}
-
-		private byte[] LoadImageData(int imageIndex)
-		{
-			var externalReferenceSolver = data.GetExternalReferenceSolver();
-			using (var stream = data.gltf.OpenImageFile(imageIndex, externalReferenceSolver))
-			{
-				return stream.ReadAllBytes();
-			}
-		}
-
-		private void LoadSampler(int? samplerIndex, Texture2D unityTexture)
-		{
-			var desiredFilterMode = FilterMode.Trilinear;
-			if (samplerIndex.HasValue)
-			{
-				var sampler = data.gltf.Samplers[samplerIndex.Value];
-
-				var minFilter = sampler.MinFilter;
-				if (minFilter.HasValue)
-					desiredFilterMode = GetFilterMode(sampler.MinFilter.Value);
-
-				unityTexture.wrapModeU = GetTextureWrapMode(sampler.WrapS);
-				unityTexture.wrapModeV = GetTextureWrapMode(sampler.WrapT);
-			}
-
-			unityTexture.filterMode = desiredFilterMode;
-			unityTexture.anisoLevel = GltfConfig.Instance.anisoLevel;
-		}
-
-		private FilterMode GetFilterMode(glTFLoader.Schema.Sampler.MinFilterEnum minFilter)
-		{
-			switch (minFilter)
-			{
-				case glTFLoader.Schema.Sampler.MinFilterEnum.NEAREST:
-				case glTFLoader.Schema.Sampler.MinFilterEnum.NEAREST_MIPMAP_NEAREST:
-				case glTFLoader.Schema.Sampler.MinFilterEnum.NEAREST_MIPMAP_LINEAR:
-					return FilterMode.Point;
-				case glTFLoader.Schema.Sampler.MinFilterEnum.LINEAR:
-				case glTFLoader.Schema.Sampler.MinFilterEnum.LINEAR_MIPMAP_NEAREST:
-					return FilterMode.Bilinear;
-				case glTFLoader.Schema.Sampler.MinFilterEnum.LINEAR_MIPMAP_LINEAR:
-					return FilterMode.Trilinear;
-				default:
-					throw new InvalidOperationException($"Invalid {nameof(glTFLoader.Schema.Sampler.MinFilterEnum)} value ({minFilter})");
-			}
-		}
-
-		private TextureWrapMode GetTextureWrapMode(glTFLoader.Schema.Sampler.WrapSEnum wrapS)
-		{
-			switch (wrapS)
-			{
-				case glTFLoader.Schema.Sampler.WrapSEnum.CLAMP_TO_EDGE:
-					return TextureWrapMode.Clamp;
-				case glTFLoader.Schema.Sampler.WrapSEnum.MIRRORED_REPEAT:
-					return TextureWrapMode.Mirror;
-				case glTFLoader.Schema.Sampler.WrapSEnum.REPEAT:
-					return TextureWrapMode.Repeat;
-				default:
-					throw new InvalidOperationException($"Invalid {nameof(glTFLoader.Schema.Sampler.WrapSEnum)} value ({wrapS})");
-			}
-		}
-
-		private TextureWrapMode GetTextureWrapMode(glTFLoader.Schema.Sampler.WrapTEnum wrapT)
-		{
-			switch (wrapT)
-			{
-				case glTFLoader.Schema.Sampler.WrapTEnum.CLAMP_TO_EDGE:
-					return TextureWrapMode.Clamp;
-				case glTFLoader.Schema.Sampler.WrapTEnum.MIRRORED_REPEAT:
-					return TextureWrapMode.Mirror;
-				case glTFLoader.Schema.Sampler.WrapTEnum.REPEAT:
-					return TextureWrapMode.Repeat;
-				default:
-					throw new InvalidOperationException($"Invalid {nameof(glTFLoader.Schema.Sampler.WrapTEnum)} value ({wrapT})");
 			}
 		}
 	}
