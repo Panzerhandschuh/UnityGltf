@@ -8,6 +8,12 @@ namespace UnityGltf
 		private GltfLoaderData data;
 		private TextureLoader textureLoader;
 
+		private enum SurfaceType
+		{
+			Opaque = 0,
+			Transparent = 1
+		}
+
 		public MaterialLoader(GltfLoaderData data)
 		{
 			this.data = data;
@@ -21,7 +27,8 @@ namespace UnityGltf
 			{
 				var material = data.gltf.Materials[materialIndex];
 
-				unityMaterial = CreateUnityMaterial(material.Name);
+				var isTransparent = material.AlphaMode != glTFLoader.Schema.Material.AlphaModeEnum.OPAQUE;
+				unityMaterial = CreateMaterial(isTransparent);
 				LoadAlphaMode(material, unityMaterial);
 				LoadMetallicRoughnessMap(material, unityMaterial);
 				LoadNormalMap(material, unityMaterial);
@@ -36,55 +43,23 @@ namespace UnityGltf
 
 		public Material LoadDefaultMaterial()
 		{
-			return CreateUnityMaterial("Default");
+			return CreateMaterial(false);
 		}
 
-		private Material CreateUnityMaterial(string materialName)
+		private Material CreateMaterial(bool isTransparent)
 		{
-			var shader = Shader.Find("Standard");
-			var unityMaterial = new Material(shader);
-			unityMaterial.name = materialName;
-
-			return unityMaterial;
+			if (isTransparent)
+				return new Material(Resources.Load<Material>("LitTransparent"));
+			else
+				return new Material(Resources.Load<Material>("LitOpaque"));
 		}
 
 		private void LoadAlphaMode(glTFLoader.Schema.Material material, Material unityMaterial)
 		{
-			switch (material.AlphaMode)
+			if (material.AlphaMode == glTFLoader.Schema.Material.AlphaModeEnum.MASK)
 			{
-				case glTFLoader.Schema.Material.AlphaModeEnum.MASK:
-					unityMaterial.SetOverrideTag("RenderType", "TransparentCutout");
-					unityMaterial.SetInt("_SrcBlend", (int)BlendMode.One);
-					unityMaterial.SetInt("_DstBlend", (int)BlendMode.Zero);
-					unityMaterial.SetInt("_ZWrite", 1);
-					unityMaterial.EnableKeyword("_ALPHATEST_ON");
-					unityMaterial.DisableKeyword("_ALPHABLEND_ON");
-					unityMaterial.DisableKeyword("_ALPHAPREMULTIPLY_ON");
-					unityMaterial.renderQueue = (int)RenderQueue.AlphaTest;
-					if (unityMaterial.HasProperty("_Cutoff"))
-						unityMaterial.SetFloat("_Cutoff", material.AlphaCutoff);
-					break;
-				case glTFLoader.Schema.Material.AlphaModeEnum.BLEND:
-					unityMaterial.SetOverrideTag("RenderType", "Transparent");
-					unityMaterial.SetInt("_SrcBlend", (int)BlendMode.SrcAlpha);
-					unityMaterial.SetInt("_DstBlend", (int)BlendMode.OneMinusSrcAlpha);
-					unityMaterial.SetInt("_ZWrite", 0);
-					unityMaterial.DisableKeyword("_ALPHATEST_ON");
-					unityMaterial.EnableKeyword("_ALPHABLEND_ON");
-					unityMaterial.DisableKeyword("_ALPHAPREMULTIPLY_ON");
-					unityMaterial.renderQueue = (int)RenderQueue.Transparent;
-					break;
-				case glTFLoader.Schema.Material.AlphaModeEnum.OPAQUE:
-				default:
-					unityMaterial.SetOverrideTag("RenderType", "Opaque");
-					unityMaterial.SetInt("_SrcBlend", (int)BlendMode.One);
-					unityMaterial.SetInt("_DstBlend", (int)BlendMode.Zero);
-					unityMaterial.SetInt("_ZWrite", 1);
-					unityMaterial.DisableKeyword("_ALPHATEST_ON");
-					unityMaterial.DisableKeyword("_ALPHABLEND_ON");
-					unityMaterial.DisableKeyword("_ALPHAPREMULTIPLY_ON");
-					unityMaterial.renderQueue = (int)RenderQueue.Geometry;
-					break;
+				unityMaterial.SetFloat("_AlphaCutoffEnable", 1f);
+				unityMaterial.SetFloat("_AlphaCutoff", material.AlphaCutoff);
 			}
 		}
 
@@ -95,14 +70,14 @@ namespace UnityGltf
 			{
 				// Base color factor
 				var baseColorFactor = TypeConverter.ConvertColor(pbrMat.BaseColorFactor);
-				unityMaterial.SetColor("_Color", baseColorFactor);
+				unityMaterial.SetColor("_BaseColor", baseColorFactor);
 
 				// Base color texture
 				var baseColorTexture = pbrMat.BaseColorTexture;
 				if (baseColorTexture != null)
 				{
 					var texture = textureLoader.LoadTexture(baseColorTexture.Index);
-					unityMaterial.SetTexture("_MainTex", texture);
+					unityMaterial.SetTexture("_BaseColorMap", texture);
 				}
 
 				// Metallic factor
@@ -111,16 +86,14 @@ namespace UnityGltf
 
 				// Roughness factor
 				var roughness = pbrMat.RoughnessFactor;
-				unityMaterial.SetFloat("_Glossiness", 1f - roughness);
+				unityMaterial.SetFloat("_Smoothness", 1f - roughness);
 
 				// Metallic-roughness texture
 				var metallicRoughnessTexture = pbrMat.MetallicRoughnessTexture;
 				if (metallicRoughnessTexture != null)
 				{
 					var texture = textureLoader.LoadTexture(metallicRoughnessTexture.Index);
-					unityMaterial.SetTexture("_MetallicGlossMap", texture);
-
-					unityMaterial.EnableKeyword("_METALLICGLOSSMAP");
+					unityMaterial.SetTexture("_MaskMap", texture);
 				}
 			}
 		}
@@ -132,13 +105,11 @@ namespace UnityGltf
 			{
 				// Scale
 				var scale = normalTexture.Scale;
-				unityMaterial.SetFloat("_BumpScale", scale);
+				unityMaterial.SetFloat("_NormalScale", scale);
 
 				// Texture
 				var texture = textureLoader.LoadTexture(normalTexture.Index);
-				unityMaterial.SetTexture("_BumpMap", texture);
-
-				unityMaterial.EnableKeyword("_NORMALMAP");
+				unityMaterial.SetTexture("_NormalMap", texture);
 			}
 		}
 
@@ -147,22 +118,24 @@ namespace UnityGltf
 			var emissiveTexture = material.EmissiveTexture;
 			if (emissiveTexture != null || material.ShouldSerializeEmissiveFactor())
 			{
+				// Exposure Weight
+				unityMaterial.SetFloat("_EmissiveExposureWeight", 0f);
+
 				// Strength
 				var strengthExtension = ExtensionUtil.LoadExtension<glTFLoader.Schema.Khr_materials_emissive_strength>(material.Extensions, "KHR_materials_emissive_strength");
 				var strength = strengthExtension != null ? strengthExtension.EmissiveStrength : 1f;
 
 				// Factor
 				var factor = TypeConverter.ConvertColor(material.EmissiveFactor);
-				unityMaterial.SetColor("_EmissionColor", factor * strength);
+				unityMaterial.SetColor("_EmissiveColor", factor * strength);
 
 				// Texture
 				if (emissiveTexture != null)
 				{
 					var texture = textureLoader.LoadTexture(emissiveTexture.Index);
-					unityMaterial.SetTexture("_EmissionMap", texture);
+					unityMaterial.SetTexture("_EmissiveColorMap", texture);
+					unityMaterial.EnableKeyword("_EMISSIVE_COLOR_MAP");
 				}
-
-				unityMaterial.EnableKeyword("_EMISSION");
 			}
 		}
 
