@@ -1,0 +1,83 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{5F091E6D-5E5A-4F37-927B-351140074E4A}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>UnityGltf</RootNamespace>
+    <AssemblyName>UnityGltf</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="glTFLoader, Version=1.1.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>Assets\Plugins\gltfLoader\glTFLoader.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>Assets\Plugins\gltfLoader\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+    <Reference Include="UnityDds, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>Assets\Plugins\UnityDds\UnityDds.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine">
+      <HintPath>C:\Program Files\Unity\Editor\Data\Managed\UnityEngine.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Assets\Scripts\AccessorLoader.cs" />
+    <Compile Include="Assets\Scripts\AnimationLoader.cs" />
+    <Compile Include="Assets\Scripts\AssetCache.cs" />
+    <Compile Include="Assets\Scripts\AssetManager.cs" />
+    <Compile Include="Assets\Scripts\AssetManagerReference.cs" />
+    <Compile Include="Assets\Scripts\ColliderLoader.cs" />
+    <Compile Include="Assets\Scripts\CoordinateSystemConverter.cs" />
+    <Compile Include="Assets\Scripts\ExtensionUtil.cs" />
+    <Compile Include="Assets\Scripts\GltfConfig.cs" />
+    <Compile Include="Assets\Scripts\GltfLoader.cs" />
+    <Compile Include="Assets\Scripts\GltfLoaderData.cs" />
+    <Compile Include="Assets\Scripts\GltfMesh.cs" />
+    <Compile Include="Assets\Scripts\MaterialLoader.cs" />
+    <Compile Include="Assets\Scripts\MeshLoader.cs" />
+    <Compile Include="Assets\Scripts\NodeLoader.cs" />
+    <Compile Include="Assets\Scripts\PersistentAssetCache.cs" />
+    <Compile Include="Assets\Scripts\ReferenceCounter.cs" />
+    <Compile Include="Assets\Scripts\TextureLoader.cs" />
+    <Compile Include="Assets\Scripts\TypeConverter.cs" />
+    <Compile Include="Assets\Scripts\Utilities\Matrix4x4Extensions.cs" />
+    <Compile Include="Assets\Scripts\Utilities\StreamExtensions.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

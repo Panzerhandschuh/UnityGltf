@@ -1,0 +1,10 @@
+{
+    "name": "UnityGltf.Scenes",
+    "references": [
+        "UnityGltf"
+    ],
+    "optionalUnityReferences": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false
+}
