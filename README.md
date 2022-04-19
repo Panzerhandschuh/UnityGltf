@@ -1,6 +1,7 @@
 # UnityGltf
 glTF importer for Unity (similar to https://github.com/KhronosGroup/UnityGLTF)
 
+Currently only the built-in render pipeline is supported.
 Use https://github.com/Panzerhandschuh/UnityGltfTool to configure colliders and convert images to dds files.
 
 Features:
