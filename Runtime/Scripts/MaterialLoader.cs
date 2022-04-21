@@ -21,7 +21,8 @@ namespace UnityGltf
 			{
 				var material = data.gltf.Materials[materialIndex];
 
-				unityMaterial = CreateUnityMaterial(material.Name);
+				unityMaterial = CreatePbrMetallicRoughnessMaterial(material.Name);
+				LoadDoubleSided(material, unityMaterial);
 				LoadAlphaMode(material, unityMaterial);
 				LoadMetallicRoughnessMap(material, unityMaterial);
 				LoadNormalMap(material, unityMaterial);
@@ -36,16 +37,24 @@ namespace UnityGltf
 
 		public Material LoadDefaultMaterial()
 		{
-			return CreateUnityMaterial("Default");
+			return CreatePbrMetallicRoughnessMaterial("Default");
 		}
 
-		private Material CreateUnityMaterial(string materialName)
+		private Material CreatePbrMetallicRoughnessMaterial(string materialName)
 		{
-			var shader = Shader.Find("Standard");
+			var shader = Shader.Find("GLTF/PbrMetallicRoughness");
 			var unityMaterial = new Material(shader);
 			unityMaterial.name = materialName;
 
 			return unityMaterial;
+		}
+
+		private void LoadDoubleSided(glTFLoader.Schema.Material material, Material unityMaterial)
+		{
+			if (material.DoubleSided)
+				unityMaterial.SetInt("_Cull", (int)CullMode.Off);
+			else
+				unityMaterial.SetInt("_Cull", (int)CullMode.Back);
 		}
 
 		private void LoadAlphaMode(glTFLoader.Schema.Material material, Material unityMaterial)
@@ -101,7 +110,7 @@ namespace UnityGltf
 				var baseColorTexture = pbrMat.BaseColorTexture;
 				if (baseColorTexture != null)
 				{
-					var texture = textureLoader.LoadTexture(baseColorTexture.Index);
+					var texture = textureLoader.LoadTexture(baseColorTexture.Index, false);
 					unityMaterial.SetTexture("_MainTex", texture);
 				}
 
@@ -111,13 +120,13 @@ namespace UnityGltf
 
 				// Roughness factor
 				var roughness = pbrMat.RoughnessFactor;
-				unityMaterial.SetFloat("_Glossiness", 1f - roughness);
+				unityMaterial.SetFloat("_Glossiness", roughness);
 
 				// Metallic-roughness texture
 				var metallicRoughnessTexture = pbrMat.MetallicRoughnessTexture;
 				if (metallicRoughnessTexture != null)
 				{
-					var texture = textureLoader.LoadTexture(metallicRoughnessTexture.Index);
+					var texture = textureLoader.LoadTexture(metallicRoughnessTexture.Index, true);
 					unityMaterial.SetTexture("_MetallicGlossMap", texture);
 
 					unityMaterial.EnableKeyword("_METALLICGLOSSMAP");
@@ -135,7 +144,7 @@ namespace UnityGltf
 				unityMaterial.SetFloat("_BumpScale", scale);
 
 				// Texture
-				var texture = textureLoader.LoadTexture(normalTexture.Index);
+				var texture = textureLoader.LoadTexture(normalTexture.Index, true);
 				unityMaterial.SetTexture("_BumpMap", texture);
 
 				unityMaterial.EnableKeyword("_NORMALMAP");
@@ -158,7 +167,7 @@ namespace UnityGltf
 				// Texture
 				if (emissiveTexture != null)
 				{
-					var texture = textureLoader.LoadTexture(emissiveTexture.Index);
+					var texture = textureLoader.LoadTexture(emissiveTexture.Index, false);
 					unityMaterial.SetTexture("_EmissionMap", texture);
 				}
 
@@ -176,7 +185,7 @@ namespace UnityGltf
 				unityMaterial.SetFloat("_OcclusionStrength", strength);
 
 				// Texture
-				var texture = textureLoader.LoadTexture(occlusionTexture.Index);
+				var texture = textureLoader.LoadTexture(occlusionTexture.Index, true);
 				unityMaterial.SetTexture("_OcclusionMap", texture);
 			}
 		}

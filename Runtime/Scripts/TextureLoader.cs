@@ -10,12 +10,14 @@ namespace UnityGltf
 	{
 		private GltfLoaderData data;
 
+		private const bool generateMipMaps = true;
+
 		public TextureLoader(GltfLoaderData data)
 		{
 			this.data = data;
 		}
 
-		public Texture2D LoadTexture(int textureIndex)
+		public Texture2D LoadTexture(int textureIndex, bool isLinear)
 		{
 			var texture = data.gltf.Textures[textureIndex];
 
@@ -23,7 +25,7 @@ namespace UnityGltf
 			if (ddsExtension != null && ddsExtension.Source.HasValue)
 				return LoadDdsTexture(ddsExtension.Source.Value, texture.Sampler);
 			else if (texture.Source.HasValue)
-				return LoadImageTexture(texture.Source.Value, texture.Sampler);
+				return LoadImageTexture(texture.Source.Value, texture.Sampler, isLinear);
 
 			return null;
 		}
@@ -51,12 +53,12 @@ namespace UnityGltf
 			}
 		}
 
-		private Texture2D LoadImageTexture(int imageIndex, int? samplerIndex)
+		private Texture2D LoadImageTexture(int imageIndex, int? samplerIndex, bool isLinear)
 		{
 			var unityTexture = data.cache.images[imageIndex];
 			if (unityTexture == null)
 			{
-				unityTexture = LoadImage(imageIndex);
+				unityTexture = LoadImage(imageIndex, isLinear);
 				LoadSampler(samplerIndex, unityTexture);
 
 				data.cache.images[imageIndex] = unityTexture;
@@ -65,9 +67,9 @@ namespace UnityGltf
 			return unityTexture;
 		}
 
-		private Texture2D LoadImage(int imageIndex)
+		private Texture2D LoadImage(int imageIndex, bool isLinear)
 		{
-			var texture = new Texture2D(0, 0);
+			var texture = new Texture2D(0, 0, TextureFormat.RGBA32, generateMipMaps, isLinear);
 
 			var data = LoadImageData(imageIndex);
 			texture.LoadImage(data, true);
