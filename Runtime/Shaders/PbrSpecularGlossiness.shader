@@ -31,7 +31,7 @@ Shader "GLTF/PbrSpecularGlossiness"
 		_EmissionColor("Emissive Factor", Color) = (0,0,0)
 		_EmissionMap("Emissive Texture", 2D) = "white" {}
 
-		_Cull("Cull", Int) = 0
+		_Cull("Cull", Int) = 2
 
 		[HideInInspector] _DetailMask("Detail Mask", 2D) = "white" {}
 

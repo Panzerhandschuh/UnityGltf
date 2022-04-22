@@ -34,7 +34,7 @@ Shader "GLTF/PbrMetallicRoughness"
 		_EmissionColor("Emissive Factor", Color) = (0,0,0)
 		_EmissionMap("Emissive Texture", 2D) = "white" {}
 
-		_Cull("Cull", Int) = 0
+		_Cull("Cull", Int) = 2
 
 		// Blending state
 		[HideInInspector] _Mode ("__mode", Float) = 0.0
