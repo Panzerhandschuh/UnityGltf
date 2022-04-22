@@ -180,7 +180,7 @@ namespace UnityEditor
             bool hadEmissionTexture = emissionMap.textureValue != null;
 
             // Texture and HDR color controls
-            m_MaterialEditor.TexturePropertySingleLine(Styles.emissionText, emissionMap, emissionColor);
+            m_MaterialEditor.TexturePropertyWithHDRColor(Styles.emissionText, emissionMap, emissionColor, false);
 
             // If texture was assigned and color was black set color to white
             float brightness = emissionColor.colorValue.maxColorComponent;
