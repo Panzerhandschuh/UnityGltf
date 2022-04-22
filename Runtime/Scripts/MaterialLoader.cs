@@ -63,6 +63,7 @@ namespace UnityGltf
 			{
 				case glTFLoader.Schema.Material.AlphaModeEnum.MASK:
 					unityMaterial.SetOverrideTag("RenderType", "TransparentCutout");
+					unityMaterial.SetFloat("_Mode", 1f);
 					unityMaterial.SetInt("_SrcBlend", (int)BlendMode.One);
 					unityMaterial.SetInt("_DstBlend", (int)BlendMode.Zero);
 					unityMaterial.SetInt("_ZWrite", 1);
@@ -75,6 +76,7 @@ namespace UnityGltf
 					break;
 				case glTFLoader.Schema.Material.AlphaModeEnum.BLEND:
 					unityMaterial.SetOverrideTag("RenderType", "Transparent");
+					unityMaterial.SetFloat("_Mode", 2f);
 					unityMaterial.SetInt("_SrcBlend", (int)BlendMode.SrcAlpha);
 					unityMaterial.SetInt("_DstBlend", (int)BlendMode.OneMinusSrcAlpha);
 					unityMaterial.SetInt("_ZWrite", 0);
@@ -86,6 +88,7 @@ namespace UnityGltf
 				case glTFLoader.Schema.Material.AlphaModeEnum.OPAQUE:
 				default:
 					unityMaterial.SetOverrideTag("RenderType", "Opaque");
+					unityMaterial.SetFloat("_Mode", 0f);
 					unityMaterial.SetInt("_SrcBlend", (int)BlendMode.One);
 					unityMaterial.SetInt("_DstBlend", (int)BlendMode.Zero);
 					unityMaterial.SetInt("_ZWrite", 1);
