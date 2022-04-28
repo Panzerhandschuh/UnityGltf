@@ -215,13 +215,17 @@ half3 Emission(float2 uv)
 #endif
 }
 
-// see this link regarding unpacking instructions:
-// https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/schema/material.normalTextureInfo.schema.json#L13
 half3 UnpackScaleNormalGLTF(half4 packednormal, half bumpScale)
 {
-	float3 normal = packednormal.xyz * 2.0 - 1.0;
-	normal.xy *= bumpScale;
-	return normalize(normal);
+	half3 normal;
+	normal.xy = (packednormal.xy * 2 - 1);
+	#if (SHADER_TARGET >= 30)
+		// SM2.0: instruction count limitation
+		// SM2.0: normal scaler is not supported
+		normal.xy *= bumpScale;
+	#endif
+	normal.z = sqrt(1.0 - saturate(dot(normal.xy, normal.xy)));
+	return normal;
 }
 
 #ifdef _NORMALMAP
