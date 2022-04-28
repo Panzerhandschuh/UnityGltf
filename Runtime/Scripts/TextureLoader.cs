@@ -17,25 +17,25 @@ namespace UnityGltf
 			this.data = data;
 		}
 
-		public Texture2D LoadTexture(int textureIndex, bool isLinear)
+		public Texture2D LoadTexture(int textureIndex, bool isLinear = false)
 		{
 			var texture = data.gltf.Textures[textureIndex];
 
 			var ddsExtension = ExtensionUtil.LoadExtension<glTFLoader.Schema.Msft_texture_ddsExtension>(texture.Extensions, "MSFT_texture_dds");
 			if (ddsExtension != null && ddsExtension.Source.HasValue)
-				return LoadDdsTexture(ddsExtension.Source.Value, texture.Sampler);
+				return LoadDdsTexture(ddsExtension.Source.Value, texture.Sampler, isLinear);
 			else if (texture.Source.HasValue)
 				return LoadImageTexture(texture.Source.Value, texture.Sampler, isLinear);
 
 			return null;
 		}
 
-		private Texture2D LoadDdsTexture(int imageIndex, int? samplerIndex)
+		private Texture2D LoadDdsTexture(int imageIndex, int? samplerIndex, bool isLinear)
 		{
 			var unityTexture = data.cache.images[imageIndex];
 			if (unityTexture == null)
 			{
-				unityTexture = LoadDds(imageIndex);
+				unityTexture = LoadDds(imageIndex, isLinear);
 				LoadSampler(samplerIndex, unityTexture);
 
 				data.cache.images[imageIndex] = unityTexture;
@@ -44,12 +44,12 @@ namespace UnityGltf
 			return unityTexture;
 		}
 
-		private Texture2D LoadDds(int imageIndex)
+		private Texture2D LoadDds(int imageIndex, bool isLinear)
 		{
 			var externalReferenceSolver = data.GetExternalReferenceSolver();
 			using (var stream = data.gltf.OpenImageFile(imageIndex, externalReferenceSolver))
 			{
-				return DdsTextureLoader.LoadTexture(stream);
+				return DdsTextureLoader.LoadTexture(stream, isLinear);
 			}
 		}
 
