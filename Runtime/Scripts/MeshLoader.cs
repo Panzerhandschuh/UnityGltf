@@ -210,6 +210,12 @@ namespace UnityGltf
 				vertexCount += subMesh.vertices.Length;
 			}
 
+			if (unityMesh.normals.Length == 0)
+				unityMesh.RecalculateNormals();
+
+			if (unityMesh.tangents.Length == 0)
+				unityMesh.RecalculateTangents();
+
 			return unityMesh;
 		}
 
