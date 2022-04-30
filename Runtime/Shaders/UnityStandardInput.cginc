@@ -215,23 +215,10 @@ half3 Emission(float2 uv)
 #endif
 }
 
-half3 UnpackScaleNormalGLTF(half4 packednormal, half bumpScale)
-{
-	half3 normal;
-	normal.xy = (packednormal.xy * 2 - 1);
-	#if (SHADER_TARGET >= 30)
-		// SM2.0: instruction count limitation
-		// SM2.0: normal scaler is not supported
-		normal.xy *= bumpScale;
-	#endif
-	normal.z = sqrt(1.0 - saturate(dot(normal.xy, normal.xy)));
-	return normal;
-}
-
 #ifdef _NORMALMAP
 half3 NormalInTangentSpace(float4 texcoords)
 {
-	half3 normalTangent = UnpackScaleNormalGLTF(tex2D (_BumpMap, texcoords.xy), _BumpScale);
+	half3 normalTangent = UnpackScaleNormal(tex2D (_BumpMap, texcoords.xy), _BumpScale);
 
 #if _DETAIL && defined(UNITY_ENABLE_DETAIL_NORMALMAP)
 	half mask = DetailMask(texcoords.xy);
