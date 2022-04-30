@@ -153,6 +153,12 @@ namespace UnityGltf
 						mesh.indices = indices;
 						break;
 					}
+				case "COLOR_0":
+					{
+						var colors = (Vector4[])arr;
+						mesh.colors = TypeConverter.ConvertColors(colors);
+						break;
+					}
 				case "JOINTS_0":
 					mesh.joints = (Vector4[])arr;
 					break;
@@ -173,6 +179,7 @@ namespace UnityGltf
 			var normals = new List<Vector3>();
 			var tangents = new List<Vector4>();
 			var texCoords = new List<Vector2>();
+			var colors = new List<Color>();
 			var joints = new List<Vector4>();
 			var weights = new List<Vector4>();
 			foreach (var subMesh in subMeshes)
@@ -185,6 +192,8 @@ namespace UnityGltf
 					tangents.AddRange(subMesh.tangents);
 				if (subMesh.texCoords != null)
 					texCoords.AddRange(subMesh.texCoords);
+				if (subMesh.colors != null)
+					colors.AddRange(subMesh.colors);
 				if (subMesh.joints != null)
 					joints.AddRange(subMesh.joints);
 				if (subMesh.weights != null)
@@ -195,6 +204,7 @@ namespace UnityGltf
 			unityMesh.SetNormals(normals);
 			unityMesh.SetTangents(tangents);
 			unityMesh.SetUVs(0, texCoords);
+			unityMesh.SetColors(colors);
 			unityMesh.boneWeights = CreateBoneWeights(joints, weights);
 
 			var vertexCount = 0;

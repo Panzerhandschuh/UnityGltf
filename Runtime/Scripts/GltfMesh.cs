@@ -9,6 +9,7 @@ namespace UnityGltf
 		public Vector3[] normals;
 		public Vector4[] tangents;
 		public Vector2[] texCoords;
+		public Color[] colors;
 		public int[] indices;
 		public Vector4[] joints;
 		public Vector4[] weights;

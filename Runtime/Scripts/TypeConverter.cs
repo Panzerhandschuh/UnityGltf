@@ -58,6 +58,20 @@ namespace UnityGltf
 			return color;
 		}
 
+		public static Color ConvertColor(Vector4 vec)
+		{
+			return new Color(vec.x, vec.y, vec.z, vec.w);
+		}
+
+		public static Color[] ConvertColors(Vector4[] arr)
+		{
+			var colors = new Color[arr.Length];
+			for (int i = 0; i < arr.Length; i++)
+				colors[i] = ConvertColor(arr[i]);
+
+			return colors;
+		}
+
 		public static Matrix4x4 ConvertMatrix4x4(float[] arr, bool convertCoordinateSystem = true)
 		{
 			var mat = new Matrix4x4();
