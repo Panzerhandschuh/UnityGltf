@@ -55,6 +55,7 @@ namespace UnityGltf
 
 		private Texture2D LoadImageTexture(int imageIndex, int? samplerIndex, bool isLinear)
 		{
+			// TODO: Copy texture if the sampler does not match the cached texture
 			var unityTexture = data.cache.images[imageIndex];
 			if (unityTexture == null)
 			{

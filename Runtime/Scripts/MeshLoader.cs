@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using glTFLoader;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 namespace UnityGltf
 {
@@ -143,6 +144,12 @@ namespace UnityGltf
 						mesh.texCoords = texCoords;
 						break;
 					}
+				case "COLOR_0":
+					{
+						var colors = (Vector4[])arr;
+						mesh.colors = TypeConverter.ConvertColors(colors);
+						break;
+					}
 				case "INDEX":
 					{
 						var indices = new int[arr.Length];
@@ -151,12 +158,6 @@ namespace UnityGltf
 
 						CoordinateSystemConverter.FlipIndices(indices);
 						mesh.indices = indices;
-						break;
-					}
-				case "COLOR_0":
-					{
-						var colors = (Vector4[])arr;
-						mesh.colors = TypeConverter.ConvertColors(colors);
 						break;
 					}
 				case "JOINTS_0":
@@ -174,6 +175,8 @@ namespace UnityGltf
 		private Mesh CreateUnityMesh(GltfMesh[] subMeshes)
 		{
 			var unityMesh = new Mesh();
+			unityMesh.indexFormat = GetVertexCount(subMeshes) > ushort.MaxValue ?
+				IndexFormat.UInt32 : IndexFormat.UInt16;
 
 			var vertices = new List<Vector3>();
 			var normals = new List<Vector3>();
@@ -227,6 +230,15 @@ namespace UnityGltf
 				unityMesh.RecalculateTangents();
 
 			return unityMesh;
+		}
+
+		private int GetVertexCount(GltfMesh[] subMeshes)
+		{
+			var count = 0;
+			foreach (var mesh in subMeshes)
+				count += mesh.vertices.Length;
+
+			return count;
 		}
 
 		private BoneWeight[] CreateBoneWeights(List<Vector4> joints, List<Vector4> weights)
